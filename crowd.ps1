@@ -9,7 +9,7 @@ function Out-fun
         [Parameter(Position = 1)]
         [ValidateScript({ Test-Path $_ })]
         [String]
-        $Dpath = $PWD
+        $Dhp = $PWD
     )
     BEGIN
     {
@@ -27,17 +27,17 @@ function Out-fun
     }
     PROCESS
     {
-        $ProId = $Process.Id
-        $ProName = $Process.Name
-        $ProHandle = $Process.Handle
-        $ProFName = "$($ProName)_$($ProId).dmp"
+        $PId = $Process.Id
+        $PName = $Process.Name
+        $PHandle = $Process.Handle
+        $PFName = "$($PName)_$($PId).dmp"
 
-        $ProDP = Join-Path $Dpath $ProFName
+        $PP = Join-Path $Dhp $PFName
 
-        $FS = New-Object IO.FileStream($ProDP, [IO.FileMode]::Create)
+        $FS = New-Object IO.FileStream($PP, [IO.FileMode]::Create)
 
-        $Res = $mdw.Invoke($null, @($ProHandle,
-                                                     $ProId,
+        $Res = $mdw.Invoke($null, @($PHandle,
+                                                     $PId,
                                                      $FS.SafeFileHandle,
                                                      $mdf,
                                                      [IntPtr]::Zero,
@@ -48,14 +48,14 @@ function Out-fun
         if (-not $Res)
         {
             $Exception = New-Object ComponentModel.Win32Exception
-            $ExceptionMessage = "$($Exception.Message) ($($ProcName):$($ProId))"
-            Remove-Item $ProDP -ErrorAction SilentlyContinue
+            $ExceptionMessage = "$($Exception.Message) ($($ProcName):$($PId))"
+            Remove-Item $PP -ErrorAction SilentlyContinue
 
             throw $ExceptionMessage
         }
         else
         {
-            Get-ChildItem $ProDP
+            Get-ChildItem $PP
         }
     }
     END {}
